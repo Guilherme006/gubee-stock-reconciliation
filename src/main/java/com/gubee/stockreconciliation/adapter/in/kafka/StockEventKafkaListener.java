@@ -3,6 +3,7 @@ package com.gubee.stockreconciliation.adapter.in.kafka;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gubee.stockreconciliation.adapter.in.kafka.dto.StockEventMessage;
+import com.gubee.stockreconciliation.adapter.out.observability.StockEventMetrics;
 import com.gubee.stockreconciliation.domain.model.ProcessStockEventResult;
 import com.gubee.stockreconciliation.domain.model.StockEvent;
 import com.gubee.stockreconciliation.domain.port.in.ProcessStockEventUseCase;
@@ -24,15 +25,18 @@ class StockEventKafkaListener {
     private final ObjectMapper objectMapper;
     private final KafkaStockEventMapper stockEventMapper;
     private final ProcessStockEventUseCase processStockEventUseCase;
+    private final StockEventMetrics stockEventMetrics;
 
     StockEventKafkaListener(
             ObjectMapper objectMapper,
             KafkaStockEventMapper stockEventMapper,
-            ProcessStockEventUseCase processStockEventUseCase
+            ProcessStockEventUseCase processStockEventUseCase,
+            StockEventMetrics stockEventMetrics
     ) {
         this.objectMapper = objectMapper;
         this.stockEventMapper = stockEventMapper;
         this.processStockEventUseCase = processStockEventUseCase;
+        this.stockEventMetrics = stockEventMetrics;
     }
 
     @KafkaListener(topics = "${stock-reconciliation.kafka.stock-events-topic}")
@@ -46,6 +50,7 @@ class StockEventKafkaListener {
             putEventMdc(event, record);
             var result = processStockEventUseCase.process(event);
             logProcessed(result);
+            stockEventMetrics.recordProcessed(result.processedEvent().status(), "kafka");
             acknowledgment.acknowledge();
         } catch (RuntimeException exception) {
             log.error(
@@ -75,6 +80,7 @@ class StockEventKafkaListener {
                     record.key(),
                     exception.getMessage()
             );
+            stockEventMetrics.recordRejected("kafka", exception.getClass().getSimpleName());
             acknowledgment.acknowledge();
             return null;
         }

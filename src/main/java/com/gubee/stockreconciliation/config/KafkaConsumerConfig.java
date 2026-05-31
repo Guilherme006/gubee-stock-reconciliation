@@ -1,5 +1,6 @@
 package com.gubee.stockreconciliation.config;
 
+import com.gubee.stockreconciliation.adapter.out.observability.StockEventMetrics;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -38,11 +39,15 @@ class KafkaConsumerConfig {
     @Bean
     DefaultErrorHandler stockEventKafkaErrorHandler(
             KafkaOperations<Object, Object> kafkaOperations,
-            StockReconciliationKafkaProperties properties
+            StockReconciliationKafkaProperties properties,
+            StockEventMetrics stockEventMetrics
     ) {
         var recoverer = new DeadLetterPublishingRecoverer(
                 kafkaOperations,
-                (record, exception) -> new TopicPartition(properties.deadLetterTopic(), record.partition())
+                (record, exception) -> {
+                    stockEventMetrics.recordDeadLetter(properties.deadLetterTopic());
+                    return new TopicPartition(properties.deadLetterTopic(), record.partition());
+                }
         );
         var errorHandler = new DefaultErrorHandler(
                 recoverer,
