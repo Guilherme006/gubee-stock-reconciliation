@@ -1,6 +1,5 @@
 package com.gubee.stockreconciliation.adapter.out.persistence;
 
-import com.gubee.stockreconciliation.adapter.out.persistence.entity.StockProjectionEntity;
 import com.gubee.stockreconciliation.adapter.out.persistence.repository.StockProjectionJpaRepository;
 import com.gubee.stockreconciliation.domain.model.StockKey;
 import com.gubee.stockreconciliation.domain.port.out.StockReconciliationLockPort;
@@ -31,12 +30,6 @@ class JpaStockReconciliationLockAdapter implements StockReconciliationLockPort {
     }
 
     private void ensureProjectionExists(StockKey stockKey) {
-        if (stockProjectionJpaRepository.findByAccountIdAndSku(stockKey.accountId(), stockKey.sku()).isEmpty()) {
-            stockProjectionJpaRepository.saveAndFlush(new StockProjectionEntity(
-                    stockKey.accountId(),
-                    stockKey.sku(),
-                    0
-            ));
-        }
+        stockProjectionJpaRepository.insertIgnore(stockKey.accountId(), stockKey.sku());
     }
 }

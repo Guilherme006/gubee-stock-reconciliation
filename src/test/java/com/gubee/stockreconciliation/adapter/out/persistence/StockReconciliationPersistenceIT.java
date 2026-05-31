@@ -14,11 +14,17 @@ import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.Instant;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Testcontainers
-@SpringBootTest
+@SpringBootTest(properties = {
+        "spring.kafka.admin.auto-create=false",
+        "spring.kafka.listener.auto-startup=false"
+})
 @ActiveProfiles("integration-test")
 class StockReconciliationPersistenceIT {
 
@@ -65,5 +71,41 @@ class StockReconciliationPersistenceIT {
         assertThat(getStockHistoryUseCase.getHistory(STOCK_KEY)).hasSize(2);
         assertThat(getProcessedStockEventUseCase.getProcessedEvent("evt-it-002"))
                 .hasValueSatisfying(processed -> assertThat(processed.status()).isEqualTo(ProcessingStatus.APPLIED));
+    }
+
+    @Test
+    void processesConcurrentDuplicateEventIdOnlyOnce() throws Exception {
+        var event = StockEvent.stockAdjusted(
+                "evt-it-concurrent-001",
+                BASE_TIME.plusSeconds(10),
+                "account-concurrent-001",
+                "CONCURRENT-123",
+                15,
+                "manual_adjustment",
+                1
+        );
+        var stockKey = event.stockKey();
+        Callable<ProcessingStatus> task = () -> processStockEventUseCase.process(event).processedEvent().status();
+        var executor = Executors.newFixedThreadPool(2);
+
+        try {
+            var results = executor.invokeAll(java.util.List.of(task, task));
+            var statuses = results.stream()
+                    .map(result -> {
+                        try {
+                            return result.get(10, TimeUnit.SECONDS);
+                        } catch (Exception exception) {
+                            throw new IllegalStateException(exception);
+                        }
+                    })
+                    .toList();
+
+            assertThat(statuses).contains(ProcessingStatus.APPLIED, ProcessingStatus.IGNORED_DUPLICATE_EVENT);
+            assertThat(getCurrentStockUseCase.getCurrentStock(stockKey))
+                    .hasValueSatisfying(balance -> assertThat(balance.available()).isEqualTo(15));
+            assertThat(getStockHistoryUseCase.getHistory(stockKey)).hasSize(1);
+        } finally {
+            executor.shutdownNow();
+        }
     }
 }

@@ -12,3 +12,4 @@ logging:
     root: INFO
     org.springframework: INFO
     org.hibernate.SQL: INFO
+    org.apache.kafka: WARN

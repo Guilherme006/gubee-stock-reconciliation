@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <springProfile name="local,test">
+    <logger name="org.springframework" level="INFO"/>
+    <logger name="org.apache.kafka" level="WARN"/>
+    <logger name="org.hibernate" level="WARN"/>
+    <logger name="org.testcontainers" level="INFO"/>
+
+    <springProfile name="local,test,integration-test">
         <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
         <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
 
@@ -9,7 +14,7 @@
         </root>
     </springProfile>
 
-    <springProfile name="!local &amp; !test">
+    <springProfile name="!local &amp; !test &amp; !integration-test">
         <appender name="JSON_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
             <encoder class="net.logstash.logback.encoder.LogstashEncoder">
                 <customFields>{"service":"gubee-stock-reconciliation"}</customFields>

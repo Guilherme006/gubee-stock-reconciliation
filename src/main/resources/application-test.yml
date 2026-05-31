@@ -10,3 +10,5 @@ logging:
     root: INFO
     org.springframework: INFO
     org.springframework.boot.autoconfigure: INFO
+    org.apache.kafka: WARN
+    org.hibernate: WARN
