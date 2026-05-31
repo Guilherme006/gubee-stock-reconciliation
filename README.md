@@ -60,6 +60,38 @@ GET /api/v1/stocks/{accountId}/{sku}/history
 GET /api/v1/events/{eventId}
 ```
 
+## Kafka
+
+Topico de entrada: `stock-events`
+
+Key recomendada: `{accountId}:{sku}`
+
+Payload:
+
+```json
+{
+  "eventId": "evt-001",
+  "type": "STOCK_ADJUSTED",
+  "occurredAt": "2026-05-28T10:00:00Z",
+  "accountId": "account-001",
+  "sku": "ABC-123",
+  "available": 10,
+  "reason": "manual_adjustment"
+}
+```
+
+Tipos suportados:
+
+```text
+STOCK_ADJUSTED
+ORDER_CREATED
+ORDER_CANCELLED
+STOCK_SYNC_SENT
+MARKETPLACE_STOCK_RESTORED
+```
+
+O consumer usa ack manual: mensagens validas sao confirmadas depois do processamento; mensagens malformadas sao rejeitadas com log estruturado e confirmadas para evitar reprocessamento infinito.
+
 ## Testes
 
 ```bash
@@ -70,6 +102,12 @@ Teste de integracao com MySQL real via Testcontainers:
 
 ```bash
 mvn -Dtest=StockReconciliationPersistenceIT test
+```
+
+Teste de integracao com Kafka e MySQL reais via Testcontainers:
+
+```bash
+mvn -Dtest=StockEventKafkaListenerIT test
 ```
 
 ## Organizacao
