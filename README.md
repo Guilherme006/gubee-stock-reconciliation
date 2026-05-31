@@ -64,6 +64,8 @@ GET /api/v1/events/{eventId}
 
 Topico de entrada: `stock-events`
 
+Topico de dead-letter: `stock-events-dlt`
+
 Key recomendada: `{accountId}:{sku}`
 
 Payload:
@@ -90,7 +92,18 @@ STOCK_SYNC_SENT
 MARKETPLACE_STOCK_RESTORED
 ```
 
-O consumer usa ack manual: mensagens validas sao confirmadas depois do processamento; mensagens malformadas sao rejeitadas com log estruturado e confirmadas para evitar reprocessamento infinito.
+O consumer usa ack manual imediato: mensagens validas sao confirmadas depois do processamento; mensagens malformadas sao rejeitadas com log estruturado e confirmadas para evitar reprocessamento infinito.
+
+Falhas transitorias de processamento passam por retry com backoff antes de serem publicadas no topico de dead-letter. Configuracao padrao:
+
+```yaml
+stock-reconciliation:
+  kafka:
+    stock-events-topic: stock-events
+    dead-letter-topic: stock-events-dlt
+    retry-max-attempts: 3
+    retry-backoff-millis: 1000
+```
 
 ## Testes
 
@@ -108,6 +121,12 @@ Teste de integracao com Kafka e MySQL reais via Testcontainers:
 
 ```bash
 mvn -Dtest=StockEventKafkaListenerIT test
+```
+
+Teste de integracao do dead-letter topic:
+
+```bash
+mvn -Dtest=StockEventKafkaDeadLetterIT test
 ```
 
 ## Organizacao
