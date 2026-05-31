@@ -1,5 +1,7 @@
 # Gubee Stock Reconciliation
 
+[![CI](https://github.com/Guilherme006/gubee-stock-reconciliation/actions/workflows/ci.yml/badge.svg)](https://github.com/Guilherme006/gubee-stock-reconciliation/actions/workflows/ci.yml)
+
 Servico para reconciliacao de estoque a partir de eventos de pedidos, ajustes e sincronizacoes com marketplaces.
 
 ## Stack
@@ -48,6 +50,8 @@ GUBEE_MYSQL_USER=gubee
 GUBEE_MYSQL_PASSWORD=gubee
 ```
 
+Use `.env.example` como referencia das variaveis disponiveis.
+
 Endpoints uteis:
 
 - API ping: `http://localhost:8080/api/v1/ping`
@@ -66,7 +70,7 @@ usuario: admin
 senha: gubee-admin
 ```
 
-Esses valores sao defaults locais. Para outro ambiente, configure:
+Esses valores sao defaults locais para facilitar a avaliacao do desafio. Nao use essas credenciais em producao. Para outro ambiente, configure:
 
 ```text
 GUBEE_SECURITY_USER
@@ -219,6 +223,22 @@ mvn -Dtest=StockEventKafkaDeadLetterIT test
 ```
 
 O projeto tambem possui GitHub Actions em `.github/workflows/ci.yml`, executando `mvn test` e os testes de integracao com Testcontainers.
+
+O status do CI pode ser acompanhado em:
+
+```text
+https://github.com/Guilherme006/gubee-stock-reconciliation/actions/workflows/ci.yml
+```
+
+## Smoke test
+
+Com Docker Compose ativo e a aplicacao rodando localmente, execute:
+
+```bash
+./scripts/smoke-test.sh
+```
+
+O script valida health, Swagger, seguranca do POST, processamento REST autenticado, consulta de saldo/evento, publicacao Kafka real e metrica de eventos processados.
 
 ## Organizacao
 

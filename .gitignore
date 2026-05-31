@@ -5,5 +5,6 @@ target/
 
 docker-compose.override.yml
 .github/modernize/
+.env
 
 *.log
