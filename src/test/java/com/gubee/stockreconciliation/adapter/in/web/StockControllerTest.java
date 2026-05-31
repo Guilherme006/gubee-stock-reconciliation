@@ -6,6 +6,7 @@ import com.gubee.stockreconciliation.domain.model.StockKey;
 import com.gubee.stockreconciliation.domain.model.StockMovement;
 import com.gubee.stockreconciliation.domain.port.in.GetCurrentStockUseCase;
 import com.gubee.stockreconciliation.domain.port.in.GetStockHistoryUseCase;
+import com.gubee.stockreconciliation.config.SecurityConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -23,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(StockController.class)
-@Import({StockRestMapper.class, RestExceptionHandler.class})
+@Import({StockRestMapper.class, RestExceptionHandler.class, SecurityConfig.class})
 class StockControllerTest {
 
     private static final StockKey STOCK_KEY = new StockKey("account-001", "ABC-123");

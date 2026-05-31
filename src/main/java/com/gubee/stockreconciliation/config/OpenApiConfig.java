@@ -1,7 +1,9 @@
 package com.gubee.stockreconciliation.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -11,9 +13,13 @@ class OpenApiConfig {
     @Bean
     OpenAPI stockReconciliationOpenApi() {
         return new OpenAPI()
+                .components(new Components()
+                        .addSecuritySchemes("basicAuth", new SecurityScheme()
+                                .type(SecurityScheme.Type.HTTP)
+                                .scheme("basic")))
                 .info(new Info()
                         .title("Gubee Stock Reconciliation API")
                         .version("v1")
-                        .description("API for receiving inventory events and auditing stock reconciliation."));
+                        .description("API para consultar reconciliacao de estoque e submeter eventos operacionais protegidos."));
     }
 }

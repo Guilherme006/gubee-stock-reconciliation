@@ -1,5 +1,7 @@
 package com.gubee.stockreconciliation.adapter.in.web;
 
+import com.gubee.stockreconciliation.adapter.out.observability.StockEventMetrics;
+import com.gubee.stockreconciliation.config.SecurityConfig;
 import com.gubee.stockreconciliation.domain.event.StockEventType;
 import com.gubee.stockreconciliation.domain.model.ProcessStockEventResult;
 import com.gubee.stockreconciliation.domain.model.ProcessedStockEvent;
@@ -24,13 +26,14 @@ import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(StockEventController.class)
-@Import({StockRestMapper.class, RestExceptionHandler.class})
+@Import({StockRestMapper.class, RestExceptionHandler.class, SecurityConfig.class})
 class StockEventControllerTest {
 
     private static final Instant OCCURRED_AT = Instant.parse("2026-05-28T10:00:00Z");
@@ -43,6 +46,9 @@ class StockEventControllerTest {
 
     @MockBean
     private GetProcessedStockEventUseCase getProcessedStockEventUseCase;
+
+    @MockBean
+    private StockEventMetrics stockEventMetrics;
 
     @Test
     void processesStockEvent() throws Exception {
@@ -62,6 +68,7 @@ class StockEventControllerTest {
         ));
 
         mockMvc.perform(post("/api/v1/events")
+                        .with(httpBasic("admin", "gubee-admin"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -81,8 +88,26 @@ class StockEventControllerTest {
     }
 
     @Test
+    void requiresAuthenticationToProcessStockEvent() throws Exception {
+        mockMvc.perform(post("/api/v1/events")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "eventId": "evt-001",
+                                  "type": "STOCK_ADJUSTED",
+                                  "occurredAt": "2026-05-28T10:00:00Z",
+                                  "accountId": "account-001",
+                                  "sku": "ABC-123",
+                                  "available": 10
+                                }
+                                """))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     void rejectsInvalidRequest() throws Exception {
         mockMvc.perform(post("/api/v1/events")
+                        .with(httpBasic("admin", "gubee-admin"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {

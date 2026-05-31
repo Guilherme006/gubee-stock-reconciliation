@@ -5,6 +5,9 @@ import com.gubee.stockreconciliation.adapter.in.web.dto.StockMovementResponse;
 import com.gubee.stockreconciliation.domain.model.StockKey;
 import com.gubee.stockreconciliation.domain.port.in.GetCurrentStockUseCase;
 import com.gubee.stockreconciliation.domain.port.in.GetStockHistoryUseCase;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +21,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/stocks")
 @Profile("!test")
+@Tag(name = "Stocks", description = "Consultas do saldo reconciliado e historico de movimentos.")
 class StockController {
 
     private final GetCurrentStockUseCase getCurrentStockUseCase;
@@ -35,6 +39,9 @@ class StockController {
     }
 
     @GetMapping("/{accountId}/{sku}")
+    @Operation(summary = "Consulta o saldo atual reconciliado")
+    @ApiResponse(responseCode = "200", description = "Saldo encontrado")
+    @ApiResponse(responseCode = "404", description = "Saldo nao encontrado")
     StockBalanceResponse getCurrentStock(@PathVariable String accountId, @PathVariable String sku) {
         var stockKey = new StockKey(accountId, sku);
         return getCurrentStockUseCase.getCurrentStock(stockKey)
@@ -43,6 +50,8 @@ class StockController {
     }
 
     @GetMapping("/{accountId}/{sku}/history")
+    @Operation(summary = "Lista o historico de movimentos de estoque")
+    @ApiResponse(responseCode = "200", description = "Historico retornado")
     List<StockMovementResponse> getHistory(@PathVariable String accountId, @PathVariable String sku) {
         var stockKey = new StockKey(accountId, sku);
         return getStockHistoryUseCase.getHistory(stockKey).stream()
