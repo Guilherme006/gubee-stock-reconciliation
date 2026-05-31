@@ -26,6 +26,8 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    listener:
+      ack-mode: manual
   mvc:
     problemdetails:
       enabled: true
@@ -52,3 +54,7 @@ logging:
   level:
     root: INFO
     com.gubee.stockreconciliation: INFO
+
+stock-reconciliation:
+  kafka:
+    stock-events-topic: stock-events
