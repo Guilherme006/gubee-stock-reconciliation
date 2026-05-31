@@ -1,0 +1,43 @@
+@baseUrl = http://localhost:8080
+@username = admin
+@password = gubee-admin
+@accountId = account-001
+@sku = ABC-123
+@eventId = evt-http-001
+
+### Health publico
+GET {{baseUrl}}/actuator/health
+
+### Swagger UI
+GET {{baseUrl}}/swagger-ui.html
+
+### OpenAPI JSON
+GET {{baseUrl}}/v3/api-docs
+
+### Processar evento REST com Basic Auth
+POST {{baseUrl}}/api/v1/events
+Authorization: Basic {{username}} {{password}}
+Content-Type: application/json
+
+{
+  "eventId": "{{eventId}}",
+  "type": "STOCK_ADJUSTED",
+  "occurredAt": "2026-05-28T10:00:00Z",
+  "accountId": "{{accountId}}",
+  "sku": "{{sku}}",
+  "available": 10,
+  "reason": "manual_adjustment"
+}
+
+### Consultar saldo atual
+GET {{baseUrl}}/api/v1/stocks/{{accountId}}/{{sku}}
+
+### Consultar historico
+GET {{baseUrl}}/api/v1/stocks/{{accountId}}/{{sku}}/history
+
+### Consultar evento processado
+GET {{baseUrl}}/api/v1/events/{{eventId}}
+
+### Metrica de eventos processados
+GET {{baseUrl}}/actuator/metrics/stock.events.processed
+Authorization: Basic {{username}} {{password}}

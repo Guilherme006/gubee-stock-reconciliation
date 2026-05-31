@@ -22,10 +22,30 @@ Suba a infraestrutura:
 docker compose up -d
 ```
 
+O MySQL fica publicado em `localhost:3307` para evitar conflito com instalacoes locais em `3306`. Dentro do Compose ele continua usando a porta padrao `3306`.
+
 Rode a aplicacao:
 
 ```bash
 mvn spring-boot:run -Dspring-boot.run.profiles=local
+```
+
+As credenciais de escrita podem ser sobrescritas por variaveis de ambiente:
+
+```bash
+GUBEE_SECURITY_USER=admin \
+GUBEE_SECURITY_PASSWORD=gubee-admin \
+mvn spring-boot:run -Dspring-boot.run.profiles=local
+```
+
+Configuracoes locais de banco tambem podem ser sobrescritas:
+
+```text
+GUBEE_MYSQL_HOST=localhost
+GUBEE_MYSQL_PORT=3307
+GUBEE_MYSQL_DATABASE=gubee_stock
+GUBEE_MYSQL_USER=gubee
+GUBEE_MYSQL_PASSWORD=gubee
 ```
 
 Endpoints uteis:
@@ -33,7 +53,7 @@ Endpoints uteis:
 - API ping: `http://localhost:8080/api/v1/ping`
 - Swagger UI: `http://localhost:8080/swagger-ui.html`
 - Health: `http://localhost:8080/actuator/health`
-- Metrics: `http://localhost:8080/actuator/metrics`
+- Metrics autenticado: `http://localhost:8080/actuator/metrics`
 
 ## Seguranca
 
@@ -44,6 +64,13 @@ Credenciais locais do desafio:
 ```text
 usuario: admin
 senha: gubee-admin
+```
+
+Esses valores sao defaults locais. Para outro ambiente, configure:
+
+```text
+GUBEE_SECURITY_USER
+GUBEE_SECURITY_PASSWORD
 ```
 
 Decisoes:
@@ -87,6 +114,8 @@ O contrato OpenAPI esta disponivel em:
 GET /v3/api-docs
 GET /swagger-ui.html
 ```
+
+Tambem ha uma colecao HTTP pronta em `http/requests.http`, com chamadas para health, Swagger, processamento de evento, saldo atual, historico, evento processado e metricas.
 
 ## Kafka
 
@@ -159,10 +188,10 @@ Metricas customizadas:
 
 Exemplos:
 
-```text
-GET /actuator/metrics/stock.events.processed
-GET /actuator/metrics/stock.events.rejected
-GET /actuator/metrics/stock.events.dead_letter
+```bash
+curl -u admin:gubee-admin http://localhost:8080/actuator/metrics/stock.events.processed
+curl -u admin:gubee-admin http://localhost:8080/actuator/metrics/stock.events.rejected
+curl -u admin:gubee-admin http://localhost:8080/actuator/metrics/stock.events.dead_letter
 ```
 
 ## Testes
@@ -189,12 +218,14 @@ Teste de integracao do dead-letter topic:
 mvn -Dtest=StockEventKafkaDeadLetterIT test
 ```
 
+O projeto tambem possui GitHub Actions em `.github/workflows/ci.yml`, executando `mvn test` e os testes de integracao com Testcontainers.
+
 ## Organizacao
 
 ```text
 domain      Regras de negocio puras, modelos e portas
 application Casos de uso e orquestracao
-adapter     Entradas e saidas externas: REST, Kafka, JPA e observabilidade
+adapter     Entradas e saidas externas: REST, Kafka, JPA, health e metricas
 config      Configuracoes Spring, Kafka, OpenAPI e seguranca
 shared      Utilitarios compartilhados de baixo acoplamento
 ```

@@ -54,6 +54,7 @@ Adaptadores de saida:
 
 - MySQL/JPA, para eventos, projecoes e auditoria.
 - Kafka producer, caso seja necessario publicar eventos processados ou falhas tecnicas em topicos especificos.
+- Observabilidade, para metricas Micrometer e health checks de infraestrutura.
 
 ## Fonte da verdade
 
@@ -227,6 +228,11 @@ Decisoes:
 - Erros de negocio devem ser persistidos como status do evento, nao necessariamente enviados para DLT.
 - DLT deve ser reservada principalmente para erros tecnicos ou payloads invalidos que nao puderam ser processados.
 
+Implementacao atual:
+
+- Payload JSON invalido e confirmado sem retry infinito, com metrica de rejeicao.
+- Falhas tecnicas durante processamento passam por retry com backoff e depois sao publicadas em `stock-events-dlt`.
+
 ## API REST e OpenAPI
 
 A API REST tera dois objetivos:
@@ -296,7 +302,17 @@ Mesmo sendo um desafio tecnico, a aplicacao deve seguir boas praticas basicas:
 - Logs sem dados sensiveis.
 - Actuator restrito ao necessario.
 
-Autenticacao/autorizacao podem ser deixadas fora do escopo inicial se o desafio nao exigir, mas em producao eu adicionaria OAuth2/JWT ou integracao com gateway/API management.
+Decisao implementada para o desafio:
+
+- Endpoints de escrita exigem Basic Auth.
+- Endpoints de consulta ficam publicos para facilitar avaliacao manual.
+- `/actuator/health` fica publico para health checks.
+- Swagger UI fica publico para melhorar a experiencia de avaliacao.
+- Usuario e senha possuem defaults locais, mas podem ser sobrescritos por `GUBEE_SECURITY_USER` e `GUBEE_SECURITY_PASSWORD`.
+
+Trade-off:
+
+- Basic Auth e simples e suficiente para o desafio. Em producao, eu adicionaria OAuth2/JWT, mTLS ou integracao com gateway/API management, alem de autorizacao por conta.
 
 ## Testes
 
@@ -328,6 +344,7 @@ A aplicacao deve expor:
 - Readiness/liveness para banco e Kafka.
 - Logs estruturados.
 - Metricas basicas de eventos processados, rejeitados e duplicados.
+- Workflow de CI com testes unitarios/slice e integracoes Testcontainers.
 
 Em producao, eu adicionaria tracing distribuido com OpenTelemetry.
 
@@ -336,7 +353,7 @@ Em producao, eu adicionaria tracing distribuido com OpenTelemetry.
 - Recalculo por agregado simplifica corretude, mas pode ser menos eficiente em alto volume.
 - Chave canonica `accountId + sku` atende ao desafio, mas pode precisar evoluir para marketplace/anuncio/deposito.
 - Kafka sera usado como entrada real, mas REST sera mantido para demonstracao e testes manuais.
-- Autenticacao pode ficar fora do escopo inicial para focar consistencia e arquitetura, desde que isso esteja claro.
+- Basic Auth foi usado no desafio por simplicidade; uma solucao produtiva exigiria autenticacao forte e autorizacao por conta.
 - Eventos de marketplace serao inicialmente auditaveis, nao autoritativos sobre o estoque canonico.
 
 ## O que faria diferente em producao
@@ -349,4 +366,3 @@ Em producao, eu adicionaria tracing distribuido com OpenTelemetry.
 - Usaria tracing distribuido e metricas com dashboards.
 - Validaria regras especificas por marketplace e por tipo de integracao.
 - Consideraria separar leitura e escrita com CQRS se o volume justificar.
-
