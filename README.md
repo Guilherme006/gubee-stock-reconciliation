@@ -40,6 +40,12 @@ Endpoints uteis:
 mvn test
 ```
 
+Teste de integracao com MySQL real via Testcontainers:
+
+```bash
+mvn -Dtest=StockReconciliationPersistenceIT test
+```
+
 ## Organizacao
 
 ```text

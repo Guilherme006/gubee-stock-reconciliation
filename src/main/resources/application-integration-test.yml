@@ -6,3 +6,9 @@ spring:
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
   kafka:
     bootstrap-servers: ${spring.embedded.kafka.brokers:localhost:9092}
+
+logging:
+  level:
+    root: INFO
+    org.springframework: INFO
+    org.hibernate.SQL: INFO
