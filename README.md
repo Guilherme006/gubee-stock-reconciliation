@@ -34,6 +34,32 @@ Endpoints uteis:
 - Swagger UI: `http://localhost:8080/swagger-ui.html`
 - Health: `http://localhost:8080/actuator/health`
 
+## API REST
+
+Processar evento:
+
+```bash
+curl -X POST http://localhost:8080/api/v1/events \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "eventId": "evt-001",
+    "type": "STOCK_ADJUSTED",
+    "occurredAt": "2026-05-28T10:00:00Z",
+    "accountId": "account-001",
+    "sku": "ABC-123",
+    "available": 10,
+    "reason": "manual_adjustment"
+  }'
+```
+
+Consultas:
+
+```text
+GET /api/v1/stocks/{accountId}/{sku}
+GET /api/v1/stocks/{accountId}/{sku}/history
+GET /api/v1/events/{eventId}
+```
+
 ## Testes
 
 ```bash
