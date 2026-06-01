@@ -1,0 +1,94 @@
+html {
+  box-sizing: border-box;
+  overflow-y: scroll;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+body {
+  margin: 0;
+  background: #fafafa;
+}
+
+.swagger-ui section.models {
+  border-color: #d8dee4;
+  border-radius: 6px;
+}
+
+.swagger-ui section.models h4 {
+  color: #30363d;
+  font-size: 15px;
+}
+
+.swagger-ui section.models .model-container {
+  background: #f7f8fa;
+  border: 1px solid #ebeef2;
+  border-radius: 6px;
+  box-shadow: none;
+}
+
+.swagger-ui section.models .model-container:hover {
+  background: #f7f8fa;
+}
+
+.swagger-ui .model-box {
+  background: transparent;
+  padding: 0;
+}
+
+.swagger-ui .json-schema-2020-12 {
+  color: #30363d;
+  background: transparent;
+  font-size: 13px;
+}
+
+.swagger-ui .json-schema-2020-12-body,
+.swagger-ui .json-schema-2020-12-keyword__children,
+.swagger-ui .json-schema-2020-12-json-viewer__children {
+  border-left: 1px solid #d8dee4;
+}
+
+.swagger-ui .json-schema-2020-12-accordion {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  color: inherit;
+}
+
+.swagger-ui .json-schema-2020-12__title,
+.swagger-ui .json-schema-2020-12-keyword__name,
+.swagger-ui .json-schema-2020-12-json-viewer__name {
+  background: transparent;
+  color: #30363d;
+}
+
+.swagger-ui .json-schema-2020-12__attribute {
+  color: #57606a;
+  font-weight: 500;
+}
+
+.swagger-ui .json-schema-2020-12__attribute--muted,
+.swagger-ui .json-schema-2020-12__constraint,
+.swagger-ui .json-schema-2020-12-expand-deep-button {
+  display: none;
+}
+
+.swagger-ui .json-schema-2020-12-keyword--description {
+  color: #57606a;
+  font-size: 13px;
+  line-height: 1.35;
+  margin: 6px 0 10px 22px;
+}
+
+.swagger-ui .json-schema-2020-12-property {
+  margin: 8px 0;
+}
+
+.swagger-ui .json-schema-2020-12-property .json-schema-2020-12__title {
+  font-size: 13px;
+  font-weight: 700;
+}

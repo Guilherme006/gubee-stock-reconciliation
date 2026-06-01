@@ -53,6 +53,16 @@ management:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+    doc-expansion: none
+    default-model-rendering: example
+    default-model-expand-depth: 2
+    default-models-expand-depth: 1
+    display-request-duration: true
+    filter: true
+    operations-sorter: method
+    tags-sorter: alpha
+    try-it-out-enabled: true
+    persist-authorization: true
 
 logging:
   level:
