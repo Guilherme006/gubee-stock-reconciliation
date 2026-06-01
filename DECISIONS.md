@@ -1,23 +1,23 @@
-# Decisoes tecnicas
+# Decisões técnicas
 
 ## Contexto
 
-Este servico, `gubee-stock-reconciliation`, tem como objetivo receber eventos de estoque e pedidos, manter uma visao atual confiavel do estoque por conta e SKU, e permitir auditoria das alteracoes que levaram ao saldo atual.
+Este serviço, `gubee-stock-reconciliation`, tem como objetivo receber eventos de estoque e pedidos, manter uma visão atual confiável do estoque por conta e SKU e permitir auditoria das alterações que levaram ao saldo atual.
 
-A solucao sera implementada em Java com Spring Boot, MySQL, Kafka real em Docker, arquitetura hexagonal, Testcontainers, logs estruturados, OpenAPI/Swagger e documentacao operacional clara.
+A solução será implementada em Java com Spring Boot, MySQL, Kafka real em Docker, arquitetura hexagonal, Testcontainers, logs estruturados, OpenAPI/Swagger e documentação operacional clara.
 
 ## Objetivos de arquitetura
 
 - Preservar todos os eventos recebidos para auditoria e reprocessamento.
-- Manter uma projecao atual de estoque para consultas rapidas.
-- Garantir idempotencia por evento recebido.
-- Reduzir risco de inconsistencias em concorrencia.
-- Isolar regra de negocio de frameworks e infraestrutura.
-- Tornar as decisoes tecnicas claras, testaveis e justificaveis.
+- Manter uma projeção atual de estoque para consultas rápidas.
+- Garantir idempotência por evento recebido.
+- Reduzir risco de inconsistências em concorrência.
+- Isolar regra de negócio de frameworks e infraestrutura.
+- Tornar as decisões técnicas claras, testáveis e justificáveis.
 
 ## Arquitetura hexagonal
 
-A aplicacao sera organizada em torno do dominio, com adaptadores para entrada e saida.
+A aplicação será organizada em torno do domínio, com adaptadores para entrada e saída.
 
 Estrutura proposta:
 
@@ -43,88 +43,88 @@ com.gubee.stockreconciliation
   shared
 ```
 
-O dominio nao deve depender de Spring, JPA, Kafka, MySQL ou detalhes HTTP. Ele deve representar as regras de estoque, idempotencia, duplicidade logica, auditoria e aplicacao de eventos.
+O domínio não deve depender de Spring, JPA, Kafka, MySQL ou detalhes HTTP. Ele deve representar as regras de estoque, idempotência, duplicidade lógica, auditoria e aplicação de eventos.
 
 Adaptadores de entrada:
 
-- REST, para submissao manual/testavel de eventos e consulta de estoque/historico.
-- Kafka consumer, para processamento assincrono dos eventos reais.
+- REST, para submissão manual/testável de eventos e consulta de estoque/histórico.
+- Kafka consumer, para processamento assíncrono dos eventos reais.
 
-Adaptadores de saida:
+Adaptadores de saída:
 
-- MySQL/JPA, para eventos, projecoes e auditoria.
-- Kafka producer, caso seja necessario publicar eventos processados ou falhas tecnicas em topicos especificos.
-- Observabilidade, para metricas Micrometer e health checks de infraestrutura.
+- MySQL/JPA, para eventos, projeções e auditoria.
+- Kafka producer, caso seja necessário publicar eventos processados ou falhas técnicas em tópicos específicos.
+- Observabilidade, para métricas Micrometer e health checks de infraestrutura.
 
 ## Fonte da verdade
 
-A fonte da verdade adotada sera o ledger de eventos persistidos, nao apenas a tabela de saldo atual.
+A fonte da verdade adotada será o ledger de eventos persistidos, não apenas a tabela de saldo atual.
 
-A tabela de saldo atual sera tratada como uma projecao derivada para leitura eficiente. Em caso de divergencia, a projecao pode ser reconstruida a partir dos eventos persistidos.
+A tabela de saldo atual será tratada como uma projeção derivada para leitura eficiente. Em caso de divergência, a projeção pode ser reconstruída a partir dos eventos persistidos.
 
 Motivos:
 
 - Permite explicar como o saldo atual foi formado.
 - Facilita auditoria.
-- Permite reprocessamento apos correcao de regra.
-- Evita depender exclusivamente do ultimo estado gravado.
+- Permite reprocessamento após correção de regra.
+- Evita depender exclusivamente do último estado gravado.
 
 Trade-off:
 
-- A solucao fica mais complexa do que um CRUD simples de estoque.
-- Reprocessar eventos exige cuidado com ordenacao, idempotencia e efeitos colaterais.
+- A solução fica mais complexa do que um CRUD simples de estoque.
+- Reprocessar eventos exige cuidado com ordenação, idempotência e efeitos colaterais.
 
 ## Chave de estoque
 
-A chave inicial do saldo de estoque sera:
+A chave inicial do saldo de estoque será:
 
 ```text
 accountId + sku
 ```
 
-O `marketplace` sera mantido nos eventos e no historico, mas nao fara parte da chave canonica inicial do saldo fisico.
+O `marketplace` será mantido nos eventos e no histórico, mas não fará parte da chave canônica inicial do saldo físico.
 
 Justificativa:
 
-- O desafio pede visao atual por conta e SKU.
-- O mesmo SKU em contas diferentes nao pode se afetar.
-- O estoque fisico disponivel normalmente pertence ao seller/conta, enquanto marketplaces representam canais de venda ou sincronizacao.
+- O desafio pede visão atual por conta e SKU.
+- O mesmo SKU em contas diferentes não pode se afetar.
+- O estoque físico disponível normalmente pertence ao seller/conta, enquanto marketplaces representam canais de venda ou sincronização.
 
 Trade-off:
 
-- Caso a operacao real exija estoque segregado por marketplace, anuncio, fulfillment ou deposito, sera necessario evoluir a chave para incluir essas dimensoes.
-- Para uma versao de producao, eu avaliaria criar projecoes adicionais por marketplace/anuncio sem abandonar a visao canonica por conta e SKU.
+- Caso a operação real exija estoque segregado por marketplace, anúncio, fulfillment ou depósito, será necessário evoluir a chave para incluir essas dimensões.
+- Para uma versão de produção, eu avaliaria criar projeções adicionais por marketplace/anúncio sem abandonar a visão canônica por conta e SKU.
 
 ## Tipos de evento
 
 Eventos inicialmente suportados:
 
-- `STOCK_ADJUSTED`: define o saldo disponivel absoluto para uma conta e SKU.
-- `ORDER_CREATED`: reduz o saldo disponivel conforme a quantidade vendida.
+- `STOCK_ADJUSTED`: define o saldo disponível absoluto para uma conta e SKU.
+- `ORDER_CREATED`: reduz o saldo disponível conforme a quantidade vendida.
 - `ORDER_CANCELLED`: devolve estoque de um pedido previamente criado.
-- `STOCK_SYNC_SENT`: registra envio de saldo ao marketplace, sem alterar o saldo canonico.
-- `MARKETPLACE_STOCK_RESTORED`: registra recomposicao feita pelo marketplace. Por padrao, nao altera automaticamente o saldo canonico sem regra explicita.
+- `STOCK_SYNC_SENT`: registra envio de saldo ao marketplace, sem alterar o saldo canônico.
+- `MARKETPLACE_STOCK_RESTORED`: registra recomposição feita pelo marketplace. Por padrão, não altera automaticamente o saldo canônico sem regra explícita.
 
-Decisao importante:
+Decisão importante:
 
-Eventos de sincronizacao e recomposicao de marketplace serao auditaveis, mas nao devem sobrescrever automaticamente o saldo canonico sem uma politica clara. Isso evita que um canal externo altere o estoque fisico sem reconciliacao.
+Eventos de sincronização e recomposição de marketplace serão auditáveis, mas não devem sobrescrever automaticamente o saldo canônico sem uma política clara. Isso evita que um canal externo altere o estoque físico sem reconciliação.
 
-## Idempotencia
+## Idempotência
 
-A idempotencia tecnica sera garantida por `eventId`.
+A idempotência técnica será garantida por `eventId`.
 
-Cada evento recebido sera persistido com uma restricao unica por `eventId`. Caso o mesmo evento seja recebido novamente, ele sera reconhecido como duplicado e nao sera aplicado de novo ao estoque.
+Cada evento recebido será persistido com uma restrição única por `eventId`. Caso o mesmo evento seja recebido novamente, ele será reconhecido como duplicado e não será aplicado de novo ao estoque.
 
 Comportamento esperado:
 
 - Mesmo `eventId` e mesmo payload: retornar/processar como duplicado idempotente.
-- Mesmo `eventId` e payload divergente: registrar erro de consistencia, pois indica reutilizacao indevida de identificador.
+- Mesmo `eventId` e payload divergente: registrar erro de consistência, pois indica reutilização indevida de identificador.
 
-## Duplicidade logica
+## Duplicidade lógica
 
-Alem da idempotencia por `eventId`, existe duplicidade logica de negocio. Exemplo: dois eventos diferentes representando o mesmo pedido.
+Além da idempotência por `eventId`, existe duplicidade lógica de negócio. Exemplo: dois eventos diferentes representando o mesmo pedido.
 
-Para pedidos, a chave logica sera:
+Para pedidos, a chave lógica será:
 
 ```text
 accountId + marketplace + externalOrderId + sku
@@ -132,113 +132,113 @@ accountId + marketplace + externalOrderId + sku
 
 Comportamento:
 
-- `ORDER_CREATED` para a mesma chave logica nao deve baixar estoque duas vezes.
-- `ORDER_CANCELLED` so deve devolver estoque se houver pedido criado correspondente ainda nao cancelado.
+- `ORDER_CREATED` para a mesma chave lógica não deve baixar estoque duas vezes.
+- `ORDER_CANCELLED` só deve devolver estoque se houver pedido criado correspondente ainda não cancelado.
 
 Trade-off:
 
-- Essa decisao assume que `externalOrderId` identifica de forma estavel o pedido dentro do marketplace.
-- Se um pedido tiver multiplos itens do mesmo SKU em eventos separados, sera necessario modelar linha de pedido ou item externo com uma chave mais granular.
+- Essa decisão assume que `externalOrderId` identifica de forma estável o pedido dentro do marketplace.
+- Se um pedido tiver múltiplos itens do mesmo SKU em eventos separados, será necessário modelar linha de pedido ou item externo com uma chave mais granular.
 
 ## Eventos fora de ordem
 
-Eventos podem chegar fora de ordem. A aplicacao deve persistir todos os eventos aceitos e aplicar o saldo considerando `occurredAt`.
+Eventos podem chegar fora de ordem. A aplicação deve persistir todos os eventos aceitos e aplicar o saldo considerando `occurredAt`.
 
-Estrategia inicial:
+Estratégia inicial:
 
 1. Persistir o evento recebido.
 2. Identificar o agregado afetado: `accountId + sku`.
-3. Recalcular a projecao desse agregado a partir dos eventos persistidos, ordenados por `occurredAt` e, em caso de empate, por ordem de recebimento.
+3. Recalcular a projeção desse agregado a partir dos eventos persistidos, ordenados por `occurredAt` e, em caso de empate, por ordem de recebimento.
 
 Justificativa:
 
-- Esta abordagem simplifica a consistencia do saldo para um desafio tecnico.
-- Torna o comportamento deterministico e facil de testar.
+- Esta abordagem simplifica a consistência do saldo para um desafio técnico.
+- Torna o comportamento determinístico e fácil de testar.
 - Evita regras frágeis baseadas somente na ordem de chegada.
 
 Trade-off:
 
 - Recalcular o agregado a cada evento pode ter custo maior com alto volume.
-- Em producao, eu avaliaria snapshots, particionamento por agregado, compactacao de historico e processamento incremental com controle de versao.
+- Em produção, eu avaliaria snapshots, particionamento por agregado, compactação de histórico e processamento incremental com controle de versão.
 
-## Concorrencia
+## Concorrência
 
-Dois eventos podem afetar o mesmo SKU ao mesmo tempo. A solucao deve evitar atualizacoes perdidas e saldo negativo acidental.
+Dois eventos podem afetar o mesmo SKU ao mesmo tempo. A solução deve evitar atualizações perdidas e saldo negativo acidental.
 
-Estrategia inicial:
+Estratégia inicial:
 
 - Processamento transacional por evento.
-- Lock por agregado `accountId + sku` durante o recálculo/aplicacao da projecao.
-- Restricoes unicas para idempotencia e duplicidade logica.
-- Versionamento da projecao de estoque com optimistic locking quando aplicavel.
+- Lock por agregado `accountId + sku` durante o recálculo/aplicação da projeção.
+- Restrições únicas para idempotência e duplicidade lógica.
+- Versionamento da projeção de estoque com optimistic locking quando aplicável.
 
-Em MySQL, o lock pode ser implementado com uma linha de projecao de estoque bloqueada via `SELECT ... FOR UPDATE` ou por mecanismo equivalente via JPA com lock pessimista.
+Em MySQL, o lock pode ser implementado com uma linha de projeção de estoque bloqueada via `SELECT ... FOR UPDATE` ou por mecanismo equivalente via JPA com lock pessimista.
 
 Trade-off:
 
 - Locks por agregado reduzem paralelismo para o mesmo SKU.
-- Em compensacao, mantem alta concorrencia entre SKUs e contas diferentes.
+- Em compensação, mantém alta concorrência entre SKUs e contas diferentes.
 
 ## Estoque negativo
 
-A regra padrao sera nao permitir saldo negativo acidentalmente.
+A regra padrão será não permitir saldo negativo acidentalmente.
 
-Eventos relativos, como `ORDER_CREATED`, nao devem levar o saldo abaixo de zero. Caso isso ocorra, o evento deve ser registrado com status de rejeicao de negocio ou falha de reconciliacao, preservando rastreabilidade.
+Eventos relativos, como `ORDER_CREATED`, não devem levar o saldo abaixo de zero. Caso isso ocorra, o evento deve ser registrado com status de rejeição de negócio ou falha de reconciliação, preservando rastreabilidade.
 
-Eventos absolutos, como `STOCK_ADJUSTED`, podem corrigir o saldo para um valor valido informado pelo cliente/sistema de origem.
+Eventos absolutos, como `STOCK_ADJUSTED`, podem corrigir o saldo para um valor válido informado pelo cliente/sistema de origem.
 
-Decisao:
+Decisão:
 
-- Saldo negativo nao sera permitido por padrao.
-- Se um cenario real exigir backorder ou venda sem estoque, isso devera virar uma regra explicita e documentada.
+- Saldo negativo não será permitido por padrão.
+- Se um cenário real exigir backorder ou venda sem estoque, isso deverá virar uma regra explícita e documentada.
 
 ## Auditoria e rastreabilidade
 
-A aplicacao deve permitir explicar por que o estoque atual chegou ao valor apresentado.
+A aplicação deve permitir explicar por que o estoque atual chegou ao valor apresentado.
 
-Serao mantidos:
+Serão mantidos:
 
 - Evento bruto recebido.
 - Status de processamento do evento.
-- Movimento gerado no estoque, quando aplicavel.
+- Movimento gerado no estoque, quando aplicável.
 - Saldo anterior e saldo posterior.
-- Motivo ou tipo de alteracao.
-- Data de ocorrencia (`occurredAt`) e data de recebimento/processamento.
+- Motivo ou tipo de alteração.
+- Data de ocorrência (`occurredAt`) e data de recebimento/processamento.
 - Correlation id para rastreamento entre logs, API e Kafka.
 
 Consultas previstas:
 
 - Saldo atual por `accountId + sku`.
-- Historico de movimentos por `accountId + sku`.
+- Histórico de movimentos por `accountId + sku`.
 - Detalhe de processamento por `eventId`.
 
 ## Kafka
 
-Kafka sera usado como canal real de entrada de eventos.
+Kafka será usado como canal real de entrada de eventos.
 
-Topicos propostos:
+Tópicos propostos:
 
 - `stock-events`: eventos recebidos para processamento.
-- `stock-events-dlt`: eventos que falharam por erro tecnico apos retentativas.
+- `stock-events-dlt`: eventos que falharam por erro técnico após retentativas.
 
-Decisoes:
+Decisões:
 
-- A chave da mensagem Kafka deve ser `accountId:sku`, favorecendo ordenacao por agregado dentro da mesma particao.
-- O consumer deve ser idempotente, pois Kafka trabalha com entrega ao menos uma vez em configuracoes comuns.
-- Erros de negocio devem ser persistidos como status do evento, nao necessariamente enviados para DLT.
-- DLT deve ser reservada principalmente para erros tecnicos ou payloads invalidos que nao puderam ser processados.
+- A chave da mensagem Kafka deve ser `accountId:sku`, favorecendo ordenação por agregado dentro da mesma partição.
+- O consumer deve ser idempotente, pois Kafka trabalha com entrega ao menos uma vez em configurações comuns.
+- Erros de negócio devem ser persistidos como status do evento, não necessariamente enviados para DLT.
+- DLT deve ser reservada principalmente para erros técnicos ou payloads inválidos que não puderam ser processados.
 
-Implementacao atual:
+Implementação atual:
 
-- Payload JSON invalido e confirmado sem retry infinito, com metrica de rejeicao.
-- Falhas tecnicas durante processamento passam por retry com backoff e depois sao publicadas em `stock-events-dlt`.
+- Payload JSON inválido é confirmado sem retry infinito, com métrica de rejeição.
+- Falhas técnicas durante o processamento passam por retry com backoff e depois são publicadas em `stock-events-dlt`.
 
 ## API REST e OpenAPI
 
-A API REST tera dois objetivos:
+A API REST terá dois objetivos:
 
-- Facilitar testes e demonstracao do desafio.
-- Expor consultas de saldo e historico.
+- Facilitar testes e demonstração do desafio.
+- Expor consultas de saldo e histórico.
 
 Endpoints iniciais:
 
@@ -249,11 +249,11 @@ GET  /api/v1/stocks/{accountId}/{sku}/history
 GET  /api/v1/events/{eventId}
 ```
 
-O contrato sera documentado via OpenAPI/Swagger usando Springdoc.
+O contrato será documentado via OpenAPI/Swagger usando Springdoc.
 
-Erros HTTP serao padronizados com `ProblemDetail`, incluindo campos como codigo, mensagem, detalhe e correlation id.
+Erros HTTP serão padronizados com `ProblemDetail`, incluindo campos como código, mensagem, detalhe e correlation id.
 
-## Persistencia
+## Persistência
 
 Banco principal: MySQL.
 
@@ -262,20 +262,20 @@ Tabelas conceituais:
 - `stock_events`: ledger dos eventos recebidos.
 - `stock_projections`: saldo atual por `accountId + sku`.
 - `stock_movements`: movimentos aplicados ao saldo.
-- `order_reservations`: controle logico de pedidos criados/cancelados.
+- `order_reservations`: controle lógico de pedidos criados/cancelados.
 
-Flyway sera usado para versionamento de schema.
+Flyway será usado para versionamento de schema.
 
-Indices importantes:
+Índices importantes:
 
-- `stock_events.event_id` unico.
+- `stock_events.event_id` único.
 - `stock_events.account_id, stock_events.sku, stock_events.occurred_at`.
-- `stock_projections.account_id, stock_projections.sku` unico.
-- `order_reservations.account_id, marketplace, external_order_id, sku` unico.
+- `stock_projections.account_id, stock_projections.sku` único.
+- `order_reservations.account_id, marketplace, external_order_id, sku` único.
 
 ## Logs estruturados
 
-Logs serao emitidos em JSON, com campos consistentes:
+Logs serão emitidos em JSON, com campos consistentes:
 
 - `timestamp`
 - `level`
@@ -287,82 +287,82 @@ Logs serao emitidos em JSON, com campos consistentes:
 - `eventType`
 - `processingStatus`
 
-Nao devem ser logados segredos, credenciais, tokens ou payloads sensiveis sem necessidade.
+Não devem ser logados segredos, credenciais, tokens ou payloads sensíveis sem necessidade.
 
-## Seguranca
+## Segurança
 
-Mesmo sendo um desafio tecnico, a aplicacao deve seguir boas praticas basicas:
+Mesmo sendo um desafio técnico, a aplicação deve seguir boas práticas básicas:
 
-- Validacao de entrada com Bean Validation.
+- Validação de entrada com Bean Validation.
 - Limites de tamanho para payloads.
-- Nao expor stack traces em respostas HTTP.
-- Nao versionar credenciais reais.
-- Configuracoes por variaveis de ambiente.
-- Usuario de banco com privilegios minimos necessarios.
-- Logs sem dados sensiveis.
-- Actuator restrito ao necessario.
+- Não expor stack traces em respostas HTTP.
+- Não versionar credenciais reais.
+- Configurações por variáveis de ambiente.
+- Usuário de banco com privilégios mínimos necessários.
+- Logs sem dados sensíveis.
+- Actuator restrito ao necessário.
 
-Decisao implementada para o desafio:
+Decisão implementada para o desafio:
 
 - Endpoints de escrita exigem Basic Auth.
-- Endpoints de consulta ficam publicos para facilitar avaliacao manual.
-- `/actuator/health` fica publico para health checks.
-- Swagger UI fica publico para melhorar a experiencia de avaliacao.
-- Usuario e senha possuem defaults locais, mas podem ser sobrescritos por `GUBEE_SECURITY_USER` e `GUBEE_SECURITY_PASSWORD`.
+- Endpoints de consulta ficam públicos para facilitar a avaliação manual.
+- `/actuator/health` fica público para health checks.
+- Swagger UI fica público para melhorar a experiência de avaliação.
+- Usuário e senha possuem defaults locais, mas podem ser sobrescritos por `GUBEE_SECURITY_USER` e `GUBEE_SECURITY_PASSWORD`.
 
 Trade-off:
 
-- Basic Auth e simples e suficiente para o desafio. Em producao, eu adicionaria OAuth2/JWT, mTLS ou integracao com gateway/API management, alem de autorizacao por conta.
+- Basic Auth é simples e suficiente para o desafio. Em produção, eu adicionaria OAuth2/JWT, mTLS ou integração com gateway/API management, além de autorização por conta.
 
 ## Testes
 
 Tipos de teste previstos:
 
-- Testes unitarios do dominio, sem Spring.
-- Testes de aplicacao para casos de uso.
-- Testes de integracao com MySQL via Testcontainers.
-- Testes de integracao com Kafka via Testcontainers.
+- Testes unitários do domínio, sem Spring.
+- Testes de aplicação para casos de uso.
+- Testes de integração com MySQL via Testcontainers.
+- Testes de integração com Kafka via Testcontainers.
 - Testes REST com MockMvc ou WebTestClient.
 
-Cenarios minimos:
+Cenários mínimos:
 
 - `STOCK_ADJUSTED available=10` resulta em saldo 10.
-- `ORDER_CREATED quantity=2` apos saldo 10 resulta em saldo 8.
+- `ORDER_CREATED quantity=2` após saldo 10 resulta em saldo 8.
 - `ORDER_CANCELLED quantity=2` devolve estoque corretamente.
-- Evento duplicado por `eventId` nao altera saldo duas vezes.
-- Pedido duplicado com outro `eventId` nao baixa estoque duas vezes.
-- Eventos fora de ordem mantem saldo deterministico.
-- Contas diferentes com mesmo SKU nao se afetam.
-- Concorrencia no mesmo SKU nao gera atualizacao perdida.
-- Tentativa de baixar estoque abaixo de zero e rejeitada.
+- Evento duplicado por `eventId` não altera saldo duas vezes.
+- Pedido duplicado com outro `eventId` não baixa estoque duas vezes.
+- Eventos fora de ordem mantêm saldo determinístico.
+- Contas diferentes com mesmo SKU não se afetam.
+- Concorrência no mesmo SKU não gera atualização perdida.
+- Tentativa de baixar estoque abaixo de zero é rejeitada.
 
 ## Observabilidade operacional
 
-A aplicacao deve expor:
+A aplicação deve expor:
 
 - Health checks via Spring Actuator.
 - Readiness/liveness para banco e Kafka.
 - Logs estruturados.
-- Metricas basicas de eventos processados, rejeitados e duplicados.
-- Workflow de CI com testes unitarios/slice e integracoes Testcontainers.
+- Métricas básicas de eventos processados, rejeitados e duplicados.
+- Workflow de CI com testes unitários/slice e integrações Testcontainers.
 
-Em producao, eu adicionaria tracing distribuido com OpenTelemetry.
+Em produção, eu adicionaria tracing distribuído com OpenTelemetry.
 
 ## Trade-offs assumidos
 
-- Recalculo por agregado simplifica corretude, mas pode ser menos eficiente em alto volume.
-- Chave canonica `accountId + sku` atende ao desafio, mas pode precisar evoluir para marketplace/anuncio/deposito.
-- Kafka sera usado como entrada real, mas REST sera mantido para demonstracao e testes manuais.
-- Basic Auth foi usado no desafio por simplicidade; uma solucao produtiva exigiria autenticacao forte e autorizacao por conta.
-- Eventos de marketplace serao inicialmente auditaveis, nao autoritativos sobre o estoque canonico.
+- Recálculo por agregado simplifica a corretude, mas pode ser menos eficiente em alto volume.
+- Chave canônica `accountId + sku` atende ao desafio, mas pode precisar evoluir para marketplace/anúncio/depósito.
+- Kafka será usado como entrada real, mas REST será mantido para demonstração e testes manuais.
+- Basic Auth foi usado no desafio por simplicidade; uma solução produtiva exigiria autenticação forte e autorização por conta.
+- Eventos de marketplace serão inicialmente auditáveis, não autoritativos sobre o estoque canônico.
 
-## O que faria diferente em producao
+## O Que Faria Diferente em Produção
 
-- Avaliaria particionamento e sharding por conta/SKU em cenarios de alto volume.
+- Avaliaria particionamento e sharding por conta/SKU em cenários de alto volume.
 - Criaria snapshots de estoque para reduzir custo de reprocessamento.
-- Adicionaria controle de schema de eventos com Schema Registry.
+- Adicionaria controle de esquema de eventos com Schema Registry.
 - Implementaria DLQ operacional com painel de reprocessamento.
-- Adicionaria autenticacao forte, autorizacao por conta e auditoria de acesso.
-- Usaria tracing distribuido e metricas com dashboards.
-- Validaria regras especificas por marketplace e por tipo de integracao.
+- Adicionaria autenticação forte, autorização por conta e auditoria de acesso.
+- Usaria tracing distribuído e métricas com dashboards.
+- Validaria regras específicas por marketplace e por tipo de integração.
 - Consideraria separar leitura e escrita com CQRS se o volume justificar.
