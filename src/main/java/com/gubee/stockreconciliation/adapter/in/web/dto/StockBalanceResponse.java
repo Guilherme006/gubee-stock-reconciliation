@@ -1,14 +1,27 @@
 package com.gubee.stockreconciliation.adapter.in.web.dto;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Schema(description = "Saldo atual reconciliado de uma conta e SKU.")
+@JsonPropertyOrder({"accountId", "sku", "available"})
+@Schema(
+        name = "StockBalanceResponse",
+        title = "Saldo atual",
+        description = "Projecao atual do saldo reconciliado para uma conta e SKU.",
+        example = """
+                {
+                  "accountId": "account-001",
+                  "sku": "ABC-123",
+                  "available": 8
+                }
+                """
+)
 public record StockBalanceResponse(
-        @Schema(example = "account-001")
+        @Schema(description = "Conta/tenant dono do estoque.", example = "account-001")
         String accountId,
-        @Schema(example = "ABC-123")
+        @Schema(description = "SKU consultado.", example = "ABC-123")
         String sku,
-        @Schema(example = "8")
+        @Schema(description = "Quantidade disponivel apos reconciliacao.", example = "8")
         int available
 ) {
 }
