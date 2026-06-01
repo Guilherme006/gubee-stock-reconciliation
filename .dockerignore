@@ -1,0 +1,9 @@
+target/
+.git/
+.idea/
+.DS_Store
+*.iml
+*.log
+.env
+.github/modernize/
+docker-compose.override.yml

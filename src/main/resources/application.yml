@@ -20,7 +20,7 @@ spring:
   flyway:
     enabled: true
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${GUBEE_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     consumer:
       group-id: gubee-stock-reconciliation
       auto-offset-reset: earliest
