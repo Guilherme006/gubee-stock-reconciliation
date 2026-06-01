@@ -128,6 +128,8 @@
                         <logging.level.org.apache.kafka>WARN</logging.level.org.apache.kafka>
                         <logging.level.org.hibernate>WARN</logging.level.org.hibernate>
                         <logging.level.org.testcontainers>WARN</logging.level.org.testcontainers>
+                        <spring.security.user.name>test-stock-writer</spring.security.user.name>
+                        <spring.security.user.password>test-stock-writer-password</spring.security.user.password>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>

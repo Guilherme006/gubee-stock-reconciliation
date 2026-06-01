@@ -37,6 +37,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class StockEventControllerTest {
 
     private static final Instant OCCURRED_AT = Instant.parse("2026-05-28T10:00:00Z");
+    private static final String TEST_SECURITY_USER = "test-stock-writer";
+    private static final String TEST_SECURITY_PASSWORD = "test-stock-writer-password";
 
     @Autowired
     private MockMvc mockMvc;
@@ -68,7 +70,7 @@ class StockEventControllerTest {
         ));
 
         mockMvc.perform(post("/api/v1/events")
-                        .with(httpBasic("admin", "gubee-admin"))
+                        .with(httpBasic(TEST_SECURITY_USER, TEST_SECURITY_PASSWORD))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -107,7 +109,7 @@ class StockEventControllerTest {
     @Test
     void rejectsInvalidRequest() throws Exception {
         mockMvc.perform(post("/api/v1/events")
-                        .with(httpBasic("admin", "gubee-admin"))
+                        .with(httpBasic(TEST_SECURITY_USER, TEST_SECURITY_PASSWORD))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {

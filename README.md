@@ -18,6 +18,14 @@ Serviço para reconciliação de estoque a partir de eventos de pedidos, ajustes
 
 ## Como Rodar Localmente
 
+Crie um arquivo `.env` local a partir do template e preencha os valores da sua máquina:
+
+```bash
+cp .env.example .env
+```
+
+O arquivo `.env` é ignorado pelo Git e deve ficar apenas no ambiente local. Em ambientes reais, injete esses valores por secrets do provedor/orquestrador, como Azure Key Vault, AWS Secrets Manager, HashiCorp Vault, Kubernetes Secrets, Docker Secrets ou GitHub Actions Secrets.
+
 Suba a aplicação completa, incluindo MySQL, Kafka e API Spring Boot:
 
 ```bash
@@ -32,29 +40,34 @@ http://localhost:8080/swagger-ui.html
 
 O MySQL fica publicado em `localhost:3307` para evitar conflito com instalações locais em `3306`. Dentro do Compose, ele continua usando a porta padrão `3306`.
 
+Se você já tinha subido o Compose antes de alterar credenciais no `.env`, recrie o volume local do MySQL para que o container inicialize o usuário novo:
+
+```bash
+docker compose down -v
+docker compose up --build -d
+```
+
 Para rodar a aplicação fora do Docker durante desenvolvimento, suba apenas a infraestrutura e execute o Maven:
 
 ```bash
+set -a
+source .env
+set +a
 docker compose up -d mysql kafka
 mvn spring-boot:run -Dspring-boot.run.profiles=local
 ```
 
-As credenciais de escrita podem ser sobrescritas por variáveis de ambiente:
-
-```bash
-GUBEE_SECURITY_USER=admin \
-GUBEE_SECURITY_PASSWORD=gubee-admin \
-mvn spring-boot:run -Dspring-boot.run.profiles=local
-```
-
-Configurações locais de banco também podem ser sobrescritas:
+Configurações locais obrigatórias/suportadas:
 
 ```text
+GUBEE_SECURITY_USER
+GUBEE_SECURITY_PASSWORD
 GUBEE_MYSQL_HOST=localhost
 GUBEE_MYSQL_PORT=3307
 GUBEE_MYSQL_DATABASE=gubee_stock
-GUBEE_MYSQL_USER=gubee
-GUBEE_MYSQL_PASSWORD=gubee
+GUBEE_MYSQL_USER
+GUBEE_MYSQL_PASSWORD
+GUBEE_MYSQL_ROOT_PASSWORD
 GUBEE_KAFKA_BOOTSTRAP_SERVERS=localhost:9092
 ```
 
@@ -71,19 +84,14 @@ Endpoints úteis:
 
 Os endpoints de consulta ficam públicos para facilitar a avaliação. Endpoints de escrita exigem Basic Auth.
 
-Credenciais locais do desafio:
-
-```text
-usuário: admin
-senha: gubee-admin
-```
-
-Esses valores são defaults locais para facilitar a avaliação do desafio. Não use essas credenciais em produção. Para outro ambiente, configure:
+As credenciais não ficam versionadas no projeto. Configure localmente no `.env` ou injete por secret no ambiente:
 
 ```text
 GUBEE_SECURITY_USER
 GUBEE_SECURITY_PASSWORD
 ```
+
+Não use valores reais em `.env.example`, `README`, `docker-compose.yml` ou arquivos de teste manual.
 
 Decisões:
 
@@ -98,8 +106,12 @@ Decisões:
 Processar evento:
 
 ```bash
+set -a
+source .env
+set +a
+
 curl -X POST http://localhost:8080/api/v1/events \
-  -u admin:gubee-admin \
+  -u "${GUBEE_SECURITY_USER}:${GUBEE_SECURITY_PASSWORD}" \
   -H 'Content-Type: application/json' \
   -d '{
     "eventId": "evt-001",
@@ -208,9 +220,9 @@ Métricas customizadas:
 Exemplos:
 
 ```bash
-curl -u admin:gubee-admin http://localhost:8080/actuator/metrics/stock.events.processed
-curl -u admin:gubee-admin http://localhost:8080/actuator/metrics/stock.events.rejected
-curl -u admin:gubee-admin http://localhost:8080/actuator/metrics/stock.events.dead_letter
+curl -u "${GUBEE_SECURITY_USER}:${GUBEE_SECURITY_PASSWORD}" http://localhost:8080/actuator/metrics/stock.events.processed
+curl -u "${GUBEE_SECURITY_USER}:${GUBEE_SECURITY_PASSWORD}" http://localhost:8080/actuator/metrics/stock.events.rejected
+curl -u "${GUBEE_SECURITY_USER}:${GUBEE_SECURITY_PASSWORD}" http://localhost:8080/actuator/metrics/stock.events.dead_letter
 ```
 
 ## Testes
@@ -293,5 +305,6 @@ Comportamentos cobertos:
 - O domínio não depende de Spring/JPA/Kafka para preservar a fronteira hexagonal e acelerar testes unitários.
 - A serialização do evento processado é armazenada para detectar `eventId` repetido com payload divergente.
 - A atualização de estoque usa lock transacional no MySQL para consistência forte por par `accountId`/`sku`.
+- Credenciais, usuários e senhas de runtime são injetados por variáveis de ambiente. Em produção, esses valores devem vir de um secret manager ou do mecanismo de secrets do orquestrador.
 
 As decisões técnicas estão documentadas em `DECISIONS.md`.

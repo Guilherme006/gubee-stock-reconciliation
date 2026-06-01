@@ -6,12 +6,12 @@ services:
     environment:
       GUBEE_MYSQL_HOST: mysql
       GUBEE_MYSQL_PORT: 3306
-      GUBEE_MYSQL_DATABASE: gubee_stock
-      GUBEE_MYSQL_USER: gubee
-      GUBEE_MYSQL_PASSWORD: gubee
+      GUBEE_MYSQL_DATABASE: ${GUBEE_MYSQL_DATABASE:-gubee_stock}
+      GUBEE_MYSQL_USER: ${GUBEE_MYSQL_USER:?Set GUBEE_MYSQL_USER in .env or your secret manager}
+      GUBEE_MYSQL_PASSWORD: ${GUBEE_MYSQL_PASSWORD:?Set GUBEE_MYSQL_PASSWORD in .env or your secret manager}
       GUBEE_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
-      GUBEE_SECURITY_USER: ${GUBEE_SECURITY_USER:-admin}
-      GUBEE_SECURITY_PASSWORD: ${GUBEE_SECURITY_PASSWORD:-gubee-admin}
+      GUBEE_SECURITY_USER: ${GUBEE_SECURITY_USER:?Set GUBEE_SECURITY_USER in .env or your secret manager}
+      GUBEE_SECURITY_PASSWORD: ${GUBEE_SECURITY_PASSWORD:?Set GUBEE_SECURITY_PASSWORD in .env or your secret manager}
       SPRING_PROFILES_ACTIVE: local
     ports:
       - "8080:8080"
@@ -25,16 +25,16 @@ services:
     image: mysql:8.4
     container_name: gubee-stock-mysql
     environment:
-      MYSQL_DATABASE: gubee_stock
-      MYSQL_USER: gubee
-      MYSQL_PASSWORD: gubee
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ${GUBEE_MYSQL_DATABASE:-gubee_stock}
+      MYSQL_USER: ${GUBEE_MYSQL_USER:?Set GUBEE_MYSQL_USER in .env or your secret manager}
+      MYSQL_PASSWORD: ${GUBEE_MYSQL_PASSWORD:?Set GUBEE_MYSQL_PASSWORD in .env or your secret manager}
+      MYSQL_ROOT_PASSWORD: ${GUBEE_MYSQL_ROOT_PASSWORD:?Set GUBEE_MYSQL_ROOT_PASSWORD in .env or your secret manager}
     ports:
-      - "3307:3306"
+      - "${GUBEE_MYSQL_PORT:-3307}:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u$${MYSQL_USER} -p$${MYSQL_PASSWORD}"]
       interval: 10s
       timeout: 5s
       retries: 10

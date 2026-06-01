@@ -1,6 +1,6 @@
 @baseUrl = http://localhost:8080
-@username = admin
-@password = gubee-admin
+@username = {{$dotenv GUBEE_SECURITY_USER}}
+@password = {{$dotenv GUBEE_SECURITY_PASSWORD}}
 @accountId = account-001
 @sku = ABC-123
 @eventId = evt-http-001

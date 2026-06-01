@@ -2,14 +2,25 @@
 set -euo pipefail
 
 BASE_URL="${BASE_URL:-http://localhost:8080}"
-USERNAME="${GUBEE_SECURITY_USER:-admin}"
-PASSWORD="${GUBEE_SECURITY_PASSWORD:-gubee-admin}"
 ACCOUNT_ID="${SMOKE_ACCOUNT_ID:-account-smoke}"
 REST_SKU="${SMOKE_REST_SKU:-SKU-SMOKE-REST}"
 KAFKA_SKU="${SMOKE_KAFKA_SKU:-SKU-SMOKE-KAFKA}"
 EVENT_SUFFIX="$(date +%Y%m%d%H%M%S)"
 REST_EVENT_ID="evt-smoke-rest-${EVENT_SUFFIX}"
 KAFKA_EVENT_ID="evt-smoke-kafka-${EVENT_SUFFIX}"
+
+if [[ -f .env ]]; then
+  set -a
+  # shellcheck disable=SC1091
+  source .env
+  set +a
+fi
+
+: "${GUBEE_SECURITY_USER:?Set GUBEE_SECURITY_USER in the environment or .env}"
+: "${GUBEE_SECURITY_PASSWORD:?Set GUBEE_SECURITY_PASSWORD in the environment or .env}"
+
+USERNAME="${GUBEE_SECURITY_USER}"
+PASSWORD="${GUBEE_SECURITY_PASSWORD}"
 
 require_command() {
   if ! command -v "$1" >/dev/null 2>&1; then

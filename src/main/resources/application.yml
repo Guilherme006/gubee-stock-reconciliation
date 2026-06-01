@@ -3,12 +3,12 @@ spring:
     name: gubee-stock-reconciliation
   security:
     user:
-      name: ${GUBEE_SECURITY_USER:admin}
-      password: ${GUBEE_SECURITY_PASSWORD:gubee-admin}
+      name: ${GUBEE_SECURITY_USER}
+      password: ${GUBEE_SECURITY_PASSWORD}
   datasource:
     url: jdbc:mysql://${GUBEE_MYSQL_HOST:localhost}:${GUBEE_MYSQL_PORT:3307}/${GUBEE_MYSQL_DATABASE:gubee_stock}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-    username: ${GUBEE_MYSQL_USER:gubee}
-    password: ${GUBEE_MYSQL_PASSWORD:gubee}
+    username: ${GUBEE_MYSQL_USER}
+    password: ${GUBEE_MYSQL_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: validate

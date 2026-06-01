@@ -310,6 +310,7 @@ Mesmo sendo um desafio técnico, a aplicação deve seguir boas práticas básic
 - Usuário de banco com privilégios mínimos necessários.
 - Logs sem dados sensíveis.
 - Actuator restrito ao necessário.
+- Segredos de runtime fornecidos por variáveis de ambiente ou secret manager, nunca por valores fixos versionados.
 
 Decisão implementada para o desafio:
 
@@ -317,7 +318,8 @@ Decisão implementada para o desafio:
 - Endpoints de consulta ficam públicos para facilitar a avaliação manual.
 - `/actuator/health` fica público para health checks.
 - Swagger UI fica público para melhorar a experiência de avaliação.
-- Usuário e senha possuem defaults locais, mas podem ser sobrescritos por `GUBEE_SECURITY_USER` e `GUBEE_SECURITY_PASSWORD`.
+- Usuário/senha da API e credenciais do MySQL são obrigatórios via ambiente. No Docker Compose local, devem ser preenchidos em `.env`, que é ignorado pelo Git.
+- Em ambientes reais, credenciais devem ser injetadas por secrets do provedor/orquestrador, como Azure Key Vault, AWS Secrets Manager, HashiCorp Vault, Kubernetes Secrets, Docker Secrets ou GitHub Actions Secrets.
 
 Nota:
 
