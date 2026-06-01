@@ -18,7 +18,7 @@ Serviço para reconciliação de estoque a partir de eventos de pedidos, ajustes
 
 ## Como Rodar Localmente
 
-Suba a aplicação completa, incluindo MySQL, Kafka e API:
+Suba a aplicação completa, incluindo MySQL, Kafka e API Spring Boot:
 
 ```bash
 docker compose up --build -d
@@ -127,6 +127,8 @@ GET /v3/api-docs
 GET /swagger-ui.html
 ```
 
+O Swagger UI foi configurado para abrir os modelos como exemplos e recebeu CSS customizado para reduzir ruído visual na seção de schemas, mantendo as constraints no contrato OpenAPI.
+
 Também há uma coleção HTTP pronta em `http/requests.http`, com chamadas para health, Swagger, processamento de evento, saldo atual, histórico, evento processado e métricas.
 
 ## Kafka
@@ -192,6 +194,11 @@ Health checks:
 - `db`: health indicator padrão do datasource MySQL.
 - `kafka`: health indicator customizado usando Kafka AdminClient.
 
+Logs:
+
+- Em execução local, testes e integração, os logs usam console simples para facilitar leitura e reduzir ruído.
+- Fora desses perfis, os logs usam JSON via Logstash Encoder, com campos de contexto quando disponíveis.
+
 Métricas customizadas:
 
 - `stock.events.processed`: eventos processados por `status` e `source`.
@@ -230,7 +237,7 @@ Teste de integração do dead-letter topic:
 mvn -Dtest=StockEventKafkaDeadLetterIT test
 ```
 
-O projeto também possui GitHub Actions em `.github/workflows/ci.yml`, executando `mvn test` e os testes de integração com Testcontainers.
+O projeto também possui GitHub Actions em `.github/workflows/ci.yml`, executando `mvn test` e uma matriz dedicada para os testes de integração com Testcontainers.
 
 O status do CI pode ser acompanhado em:
 

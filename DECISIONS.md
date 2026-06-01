@@ -4,7 +4,7 @@
 
 Este serviço, `gubee-stock-reconciliation`, tem como objetivo receber eventos de estoque e pedidos, manter uma visão atual confiável do estoque por conta e SKU e permitir auditoria das alterações que levaram ao saldo atual.
 
-A solução será implementada em Java com Spring Boot, MySQL, Kafka real em Docker, arquitetura hexagonal, Testcontainers, logs estruturados, OpenAPI/Swagger e documentação operacional clara.
+A solução foi implementada em Java com Spring Boot, MySQL, Kafka real em Docker, arquitetura hexagonal, Testcontainers, logs estruturados, OpenAPI/Swagger e documentação operacional clara.
 
 ## Objetivos de arquitetura
 
@@ -19,7 +19,7 @@ A solução será implementada em Java com Spring Boot, MySQL, Kafka real em Doc
 
 A aplicação será organizada em torno do domínio, com adaptadores para entrada e saída.
 
-Estrutura proposta:
+Estrutura adotada:
 
 ```text
 com.gubee.stockreconciliation
@@ -29,6 +29,8 @@ com.gubee.stockreconciliation
     policy
     exception
     port
+      in
+      out
   application
     usecase
     service
@@ -38,6 +40,7 @@ com.gubee.stockreconciliation
       kafka
     out
       persistence
+      observability
       messaging
   config
   shared
@@ -196,7 +199,7 @@ Decisão:
 
 A aplicação deve permitir explicar por que o estoque atual chegou ao valor apresentado.
 
-Serão mantidos:
+São mantidos:
 
 - Evento bruto recebido.
 - Status de processamento do evento.
@@ -204,7 +207,12 @@ Serão mantidos:
 - Saldo anterior e saldo posterior.
 - Motivo ou tipo de alteração.
 - Data de ocorrência (`occurredAt`) e data de recebimento/processamento.
-- Correlation id para rastreamento entre logs, API e Kafka.
+
+Também são registrados campos de contexto em logs de Kafka via MDC, como `eventId`, `eventType`, `accountId`, `sku`, tópico, partição e offset.
+
+Nota:
+
+- `correlationId` entre HTTP, logs e Kafka ainda não foi implementado. É uma evolução recomendada para produção ou para uma segunda iteração do desafio.
 
 Consultas previstas:
 
@@ -275,17 +283,18 @@ Flyway será usado para versionamento de schema.
 
 ## Logs estruturados
 
-Logs serão emitidos em JSON, com campos consistentes:
+Fora dos perfis `local`, `test` e `integration-test`, os logs são emitidos em JSON. Campos de contexto são adicionados quando disponíveis:
 
 - `timestamp`
 - `level`
 - `message`
-- `correlationId`
 - `eventId`
 - `accountId`
 - `sku`
 - `eventType`
-- `processingStatus`
+- `kafkaTopic`
+- `kafkaPartition`
+- `kafkaOffset`
 
 Não devem ser logados segredos, credenciais, tokens ou payloads sensíveis sem necessidade.
 
@@ -294,7 +303,7 @@ Não devem ser logados segredos, credenciais, tokens ou payloads sensíveis sem 
 Mesmo sendo um desafio técnico, a aplicação deve seguir boas práticas básicas:
 
 - Validação de entrada com Bean Validation.
-- Limites de tamanho para payloads.
+- Rejeição de payloads inválidos.
 - Não expor stack traces em respostas HTTP.
 - Não versionar credenciais reais.
 - Configurações por variáveis de ambiente.
@@ -309,6 +318,10 @@ Decisão implementada para o desafio:
 - `/actuator/health` fica público para health checks.
 - Swagger UI fica público para melhorar a experiência de avaliação.
 - Usuário e senha possuem defaults locais, mas podem ser sobrescritos por `GUBEE_SECURITY_USER` e `GUBEE_SECURITY_PASSWORD`.
+
+Nota:
+
+- Um limite explícito de tamanho de payload por endpoint ainda não foi configurado. Para produção, eu adicionaria limite de body no servidor/gateway e testes específicos para payload excessivo.
 
 Trade-off:
 
@@ -338,13 +351,15 @@ Cenários mínimos:
 
 ## Observabilidade operacional
 
-A aplicação deve expor:
+A aplicação expõe:
 
 - Health checks via Spring Actuator.
-- Readiness/liveness para banco e Kafka.
-- Logs estruturados.
+- Health de banco via datasource e health customizado de Kafka via AdminClient.
+- Logs estruturados em JSON fora dos perfis locais/teste; nos perfis `local`, `test` e `integration-test`, os logs ficam em console simples para reduzir ruído.
 - Métricas básicas de eventos processados, rejeitados e duplicados.
 - Workflow de CI com testes unitários/slice e integrações Testcontainers.
+
+O Swagger UI foi mantido público para avaliação e recebeu configuração visual específica para deixar a seção de schemas mais legível, sem remover constraints do contrato OpenAPI.
 
 Em produção, eu adicionaria tracing distribuído com OpenTelemetry.
 
