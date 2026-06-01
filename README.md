@@ -18,17 +18,24 @@ Serviço para reconciliação de estoque a partir de eventos de pedidos, ajustes
 
 ## Como Rodar Localmente
 
-Suba a infraestrutura:
+Suba a aplicação completa, incluindo MySQL, Kafka e API:
 
 ```bash
-docker compose up -d
+docker compose up --build -d
+```
+
+Depois acesse:
+
+```text
+http://localhost:8080/swagger-ui.html
 ```
 
 O MySQL fica publicado em `localhost:3307` para evitar conflito com instalações locais em `3306`. Dentro do Compose, ele continua usando a porta padrão `3306`.
 
-Rode a aplicação:
+Para rodar a aplicação fora do Docker durante desenvolvimento, suba apenas a infraestrutura e execute o Maven:
 
 ```bash
+docker compose up -d mysql kafka
 mvn spring-boot:run -Dspring-boot.run.profiles=local
 ```
 
@@ -48,6 +55,7 @@ GUBEE_MYSQL_PORT=3307
 GUBEE_MYSQL_DATABASE=gubee_stock
 GUBEE_MYSQL_USER=gubee
 GUBEE_MYSQL_PASSWORD=gubee
+GUBEE_KAFKA_BOOTSTRAP_SERVERS=localhost:9092
 ```
 
 Use `.env.example` como referência das variáveis disponíveis.
@@ -232,7 +240,7 @@ https://github.com/Guilherme006/gubee-stock-reconciliation/actions/workflows/ci.
 
 ## Smoke test
 
-Com Docker Compose ativo e a aplicação rodando localmente, execute:
+Com Docker Compose ativo, execute:
 
 ```bash
 ./scripts/smoke-test.sh
