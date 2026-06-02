@@ -41,7 +41,6 @@ com.gubee.stockreconciliation
     out
       persistence
       observability
-      messaging
   config
   shared
 ```
