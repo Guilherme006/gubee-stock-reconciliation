@@ -27,12 +27,10 @@ com.gubee.stockreconciliation
     model
     event
     policy
-    exception
     port
       in
       out
   application
-    usecase
     service
   adapter
     in
@@ -42,7 +40,6 @@ com.gubee.stockreconciliation
       persistence
       observability
   config
-  shared
 ```
 
 O domínio não deve depender de Spring, JPA, Kafka, MySQL ou detalhes HTTP. Ele deve representar as regras de estoque, idempotência, duplicidade lógica, auditoria e aplicação de eventos.

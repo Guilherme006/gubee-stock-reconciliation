@@ -274,7 +274,6 @@ domain      Regras de negócio puras, modelos e portas
 application Casos de uso e orquestração
 adapter     Entradas e saídas externas: REST, Kafka, JPA, health e métricas
 config      Configurações Spring, Kafka, OpenAPI e segurança
-shared      Utilitários compartilhados de baixo acoplamento
 ```
 
 ## Arquitetura
