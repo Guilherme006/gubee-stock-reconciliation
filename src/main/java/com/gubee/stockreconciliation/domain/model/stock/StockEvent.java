@@ -1,6 +1,7 @@
-package com.gubee.stockreconciliation.domain.model;
+package com.gubee.stockreconciliation.domain.model.stock;
 
 import com.gubee.stockreconciliation.domain.event.StockEventType;
+import com.gubee.stockreconciliation.domain.model.order.OrderKey;
 
 import java.time.Instant;
 import java.util.Objects;

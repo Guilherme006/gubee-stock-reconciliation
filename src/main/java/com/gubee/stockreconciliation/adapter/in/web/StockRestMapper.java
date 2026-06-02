@@ -1,15 +1,15 @@
 package com.gubee.stockreconciliation.adapter.in.web;
 
-import com.gubee.stockreconciliation.adapter.in.web.dto.ProcessStockEventResponse;
-import com.gubee.stockreconciliation.adapter.in.web.dto.ProcessedEventResponse;
-import com.gubee.stockreconciliation.adapter.in.web.dto.StockBalanceResponse;
-import com.gubee.stockreconciliation.adapter.in.web.dto.StockEventRequest;
-import com.gubee.stockreconciliation.adapter.in.web.dto.StockMovementResponse;
-import com.gubee.stockreconciliation.domain.model.ProcessStockEventResult;
-import com.gubee.stockreconciliation.domain.model.ProcessedStockEvent;
-import com.gubee.stockreconciliation.domain.model.StockBalance;
-import com.gubee.stockreconciliation.domain.model.StockEvent;
-import com.gubee.stockreconciliation.domain.model.StockMovement;
+import com.gubee.stockreconciliation.adapter.in.web.dto.event.ProcessStockEventResponse;
+import com.gubee.stockreconciliation.adapter.in.web.dto.event.ProcessedEventResponse;
+import com.gubee.stockreconciliation.adapter.in.web.dto.stock.StockBalanceResponse;
+import com.gubee.stockreconciliation.adapter.in.web.dto.event.StockEventRequest;
+import com.gubee.stockreconciliation.adapter.in.web.dto.stock.StockMovementResponse;
+import com.gubee.stockreconciliation.domain.model.processing.ProcessStockEventResult;
+import com.gubee.stockreconciliation.domain.model.processing.ProcessedStockEvent;
+import com.gubee.stockreconciliation.domain.model.stock.StockBalance;
+import com.gubee.stockreconciliation.domain.model.stock.StockEvent;
+import com.gubee.stockreconciliation.domain.model.stock.StockMovement;
 import org.springframework.stereotype.Component;
 
 @Component

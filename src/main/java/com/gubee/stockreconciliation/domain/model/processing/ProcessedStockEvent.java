@@ -1,4 +1,6 @@
-package com.gubee.stockreconciliation.domain.model;
+package com.gubee.stockreconciliation.domain.model.processing;
+
+import com.gubee.stockreconciliation.domain.model.stock.StockEvent;
 
 import java.util.Objects;
 

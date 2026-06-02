@@ -1,6 +1,6 @@
 package com.gubee.stockreconciliation.adapter.in.kafka;
 
-import com.gubee.stockreconciliation.domain.model.StockEvent;
+import com.gubee.stockreconciliation.domain.model.stock.StockEvent;
 import com.gubee.stockreconciliation.domain.port.in.GetCurrentStockUseCase;
 import com.gubee.stockreconciliation.domain.port.in.GetProcessedStockEventUseCase;
 import com.gubee.stockreconciliation.domain.port.in.GetStockHistoryUseCase;

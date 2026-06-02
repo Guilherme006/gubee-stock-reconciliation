@@ -1,9 +1,9 @@
 package com.gubee.stockreconciliation.domain.policy;
 
-import com.gubee.stockreconciliation.domain.model.MovementType;
-import com.gubee.stockreconciliation.domain.model.ProcessingStatus;
-import com.gubee.stockreconciliation.domain.model.StockEvent;
-import com.gubee.stockreconciliation.domain.model.StockKey;
+import com.gubee.stockreconciliation.domain.model.stock.MovementType;
+import com.gubee.stockreconciliation.domain.model.processing.ProcessingStatus;
+import com.gubee.stockreconciliation.domain.model.stock.StockEvent;
+import com.gubee.stockreconciliation.domain.model.stock.StockKey;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;

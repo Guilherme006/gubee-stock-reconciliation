@@ -1,7 +1,7 @@
 package com.gubee.stockreconciliation.domain.port.in;
 
-import com.gubee.stockreconciliation.domain.model.StockKey;
-import com.gubee.stockreconciliation.domain.model.StockMovement;
+import com.gubee.stockreconciliation.domain.model.stock.StockKey;
+import com.gubee.stockreconciliation.domain.model.stock.StockMovement;
 
 import java.util.List;
 

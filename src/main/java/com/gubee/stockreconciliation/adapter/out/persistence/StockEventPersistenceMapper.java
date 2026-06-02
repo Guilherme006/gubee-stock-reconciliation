@@ -3,7 +3,7 @@ package com.gubee.stockreconciliation.adapter.out.persistence;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gubee.stockreconciliation.adapter.out.persistence.entity.StockEventEntity;
-import com.gubee.stockreconciliation.domain.model.StockEvent;
+import com.gubee.stockreconciliation.domain.model.stock.StockEvent;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;

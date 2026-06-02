@@ -1,8 +1,8 @@
 package com.gubee.stockreconciliation.adapter.in.web;
 
-import com.gubee.stockreconciliation.adapter.in.web.dto.ProcessStockEventResponse;
-import com.gubee.stockreconciliation.adapter.in.web.dto.ProcessedEventResponse;
-import com.gubee.stockreconciliation.adapter.in.web.dto.StockEventRequest;
+import com.gubee.stockreconciliation.adapter.in.web.dto.event.ProcessStockEventResponse;
+import com.gubee.stockreconciliation.adapter.in.web.dto.event.ProcessedEventResponse;
+import com.gubee.stockreconciliation.adapter.in.web.dto.event.StockEventRequest;
 import com.gubee.stockreconciliation.adapter.out.observability.StockEventMetrics;
 import com.gubee.stockreconciliation.domain.port.in.GetProcessedStockEventUseCase;
 import com.gubee.stockreconciliation.domain.port.in.ProcessStockEventUseCase;

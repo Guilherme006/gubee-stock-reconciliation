@@ -1,4 +1,4 @@
-package com.gubee.stockreconciliation.domain.model;
+package com.gubee.stockreconciliation.domain.model.order;
 
 public record OrderKey(String accountId, String marketplace, String externalOrderId, String sku) {
 

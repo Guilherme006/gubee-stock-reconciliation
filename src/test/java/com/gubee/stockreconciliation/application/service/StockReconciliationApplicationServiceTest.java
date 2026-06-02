@@ -1,12 +1,12 @@
 package com.gubee.stockreconciliation.application.service;
 
-import com.gubee.stockreconciliation.domain.model.ProcessedStockEvent;
-import com.gubee.stockreconciliation.domain.model.ProcessingStatus;
-import com.gubee.stockreconciliation.domain.model.StockBalance;
-import com.gubee.stockreconciliation.domain.model.StockEvent;
-import com.gubee.stockreconciliation.domain.model.StockKey;
-import com.gubee.stockreconciliation.domain.model.StockMovement;
-import com.gubee.stockreconciliation.domain.model.StockReconciliationResult;
+import com.gubee.stockreconciliation.domain.model.processing.ProcessedStockEvent;
+import com.gubee.stockreconciliation.domain.model.processing.ProcessingStatus;
+import com.gubee.stockreconciliation.domain.model.stock.StockBalance;
+import com.gubee.stockreconciliation.domain.model.stock.StockEvent;
+import com.gubee.stockreconciliation.domain.model.stock.StockKey;
+import com.gubee.stockreconciliation.domain.model.stock.StockMovement;
+import com.gubee.stockreconciliation.domain.model.stock.StockReconciliationResult;
 import com.gubee.stockreconciliation.domain.policy.StockReconciler;
 import com.gubee.stockreconciliation.domain.port.out.StockLedgerPort;
 import com.gubee.stockreconciliation.domain.port.out.StockReconciliationLockPort;

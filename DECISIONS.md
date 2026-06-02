@@ -25,6 +25,9 @@ Estrutura adotada:
 com.gubee.stockreconciliation
   domain
     model
+      stock
+      order
+      processing
     event
     policy
     port

@@ -1,6 +1,6 @@
 package com.gubee.stockreconciliation.domain.port.out;
 
-import com.gubee.stockreconciliation.domain.model.StockKey;
+import com.gubee.stockreconciliation.domain.model.stock.StockKey;
 
 import java.util.function.Supplier;
 

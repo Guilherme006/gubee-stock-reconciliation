@@ -1,4 +1,4 @@
-package com.gubee.stockreconciliation.domain.model;
+package com.gubee.stockreconciliation.domain.model.stock;
 
 public record StockKey(String accountId, String sku) {
 

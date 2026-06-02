@@ -1,7 +1,7 @@
 package com.gubee.stockreconciliation.adapter.in.kafka;
 
 import com.gubee.stockreconciliation.adapter.in.kafka.dto.StockEventMessage;
-import com.gubee.stockreconciliation.domain.model.StockEvent;
+import com.gubee.stockreconciliation.domain.model.stock.StockEvent;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;

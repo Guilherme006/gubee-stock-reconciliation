@@ -1,8 +1,8 @@
 package com.gubee.stockreconciliation.adapter.in.web;
 
-import com.gubee.stockreconciliation.adapter.in.web.dto.StockBalanceResponse;
-import com.gubee.stockreconciliation.adapter.in.web.dto.StockMovementResponse;
-import com.gubee.stockreconciliation.domain.model.StockKey;
+import com.gubee.stockreconciliation.adapter.in.web.dto.stock.StockBalanceResponse;
+import com.gubee.stockreconciliation.adapter.in.web.dto.stock.StockMovementResponse;
+import com.gubee.stockreconciliation.domain.model.stock.StockKey;
 import com.gubee.stockreconciliation.domain.port.in.GetCurrentStockUseCase;
 import com.gubee.stockreconciliation.domain.port.in.GetStockHistoryUseCase;
 import io.swagger.v3.oas.annotations.Operation;

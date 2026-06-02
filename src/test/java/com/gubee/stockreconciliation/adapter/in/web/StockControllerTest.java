@@ -1,9 +1,9 @@
 package com.gubee.stockreconciliation.adapter.in.web;
 
-import com.gubee.stockreconciliation.domain.model.MovementType;
-import com.gubee.stockreconciliation.domain.model.StockBalance;
-import com.gubee.stockreconciliation.domain.model.StockKey;
-import com.gubee.stockreconciliation.domain.model.StockMovement;
+import com.gubee.stockreconciliation.domain.model.stock.MovementType;
+import com.gubee.stockreconciliation.domain.model.stock.StockBalance;
+import com.gubee.stockreconciliation.domain.model.stock.StockKey;
+import com.gubee.stockreconciliation.domain.model.stock.StockMovement;
 import com.gubee.stockreconciliation.domain.port.in.GetCurrentStockUseCase;
 import com.gubee.stockreconciliation.domain.port.in.GetStockHistoryUseCase;
 import com.gubee.stockreconciliation.config.SecurityConfig;

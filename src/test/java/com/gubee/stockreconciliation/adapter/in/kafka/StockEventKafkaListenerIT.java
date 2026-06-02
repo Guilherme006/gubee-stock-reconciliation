@@ -1,7 +1,7 @@
 package com.gubee.stockreconciliation.adapter.in.kafka;
 
-import com.gubee.stockreconciliation.domain.model.ProcessingStatus;
-import com.gubee.stockreconciliation.domain.model.StockKey;
+import com.gubee.stockreconciliation.domain.model.processing.ProcessingStatus;
+import com.gubee.stockreconciliation.domain.model.stock.StockKey;
 import com.gubee.stockreconciliation.domain.port.in.GetCurrentStockUseCase;
 import com.gubee.stockreconciliation.domain.port.in.GetProcessedStockEventUseCase;
 import org.junit.jupiter.api.Test;

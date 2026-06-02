@@ -1,6 +1,7 @@
-package com.gubee.stockreconciliation.adapter.in.web.dto;
+package com.gubee.stockreconciliation.adapter.in.web.dto.event;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.gubee.stockreconciliation.adapter.in.web.dto.stock.StockMovementResponse;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 

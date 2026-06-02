@@ -1,8 +1,8 @@
 package com.gubee.stockreconciliation.adapter.out.persistence;
 
 import com.gubee.stockreconciliation.adapter.out.persistence.repository.StockEventJpaRepository;
-import com.gubee.stockreconciliation.domain.model.StockEvent;
-import com.gubee.stockreconciliation.domain.model.StockKey;
+import com.gubee.stockreconciliation.domain.model.stock.StockEvent;
+import com.gubee.stockreconciliation.domain.model.stock.StockKey;
 import com.gubee.stockreconciliation.domain.port.out.StockLedgerPort;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;

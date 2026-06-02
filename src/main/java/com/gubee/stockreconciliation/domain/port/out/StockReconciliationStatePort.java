@@ -1,10 +1,10 @@
 package com.gubee.stockreconciliation.domain.port.out;
 
-import com.gubee.stockreconciliation.domain.model.ProcessedStockEvent;
-import com.gubee.stockreconciliation.domain.model.StockBalance;
-import com.gubee.stockreconciliation.domain.model.StockKey;
-import com.gubee.stockreconciliation.domain.model.StockMovement;
-import com.gubee.stockreconciliation.domain.model.StockReconciliationResult;
+import com.gubee.stockreconciliation.domain.model.processing.ProcessedStockEvent;
+import com.gubee.stockreconciliation.domain.model.stock.StockBalance;
+import com.gubee.stockreconciliation.domain.model.stock.StockKey;
+import com.gubee.stockreconciliation.domain.model.stock.StockMovement;
+import com.gubee.stockreconciliation.domain.model.stock.StockReconciliationResult;
 
 import java.util.List;
 import java.util.Optional;

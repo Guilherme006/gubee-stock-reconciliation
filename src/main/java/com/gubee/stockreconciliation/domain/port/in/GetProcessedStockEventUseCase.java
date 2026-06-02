@@ -1,6 +1,6 @@
 package com.gubee.stockreconciliation.domain.port.in;
 
-import com.gubee.stockreconciliation.domain.model.ProcessedStockEvent;
+import com.gubee.stockreconciliation.domain.model.processing.ProcessedStockEvent;
 
 import java.util.Optional;
 

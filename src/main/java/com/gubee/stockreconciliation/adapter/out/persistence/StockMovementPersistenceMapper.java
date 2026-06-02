@@ -1,9 +1,9 @@
 package com.gubee.stockreconciliation.adapter.out.persistence;
 
 import com.gubee.stockreconciliation.adapter.out.persistence.entity.StockMovementEntity;
-import com.gubee.stockreconciliation.domain.model.MovementType;
-import com.gubee.stockreconciliation.domain.model.StockKey;
-import com.gubee.stockreconciliation.domain.model.StockMovement;
+import com.gubee.stockreconciliation.domain.model.stock.MovementType;
+import com.gubee.stockreconciliation.domain.model.stock.StockKey;
+import com.gubee.stockreconciliation.domain.model.stock.StockMovement;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;

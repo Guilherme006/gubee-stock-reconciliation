@@ -1,6 +1,6 @@
 package com.gubee.stockreconciliation.adapter.out.observability;
 
-import com.gubee.stockreconciliation.domain.model.ProcessingStatus;
+import com.gubee.stockreconciliation.domain.model.processing.ProcessingStatus;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.stereotype.Component;
 
